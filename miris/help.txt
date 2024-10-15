@@ -1,0 +1,145 @@
+Specification for miris command generated-output:
+In case of unrecognized command:
+    ERROR INDICATION: "Unrecognized command"
+
+0. COMMAND: ANY
+    ERROR INDICATION: "Format error: " COMMAND_NAME COMMAND OPTIONS
+
+1.  COMMAND: i Ni [Nj Nk ...]
+    	 OR
+    	 insert Ni [Nj Nk ...]
+    COMMENT: insert into the graph structure 1 or more nodes
+             with specific INT ids.
+    EXPECTED OUTPUT:
+    	 "Succ:" Ni Nj ..
+    ERROR INDICATION:
+    	 "IssueWith:" Nj Nk Nl ..
+
+2.  COMMAND: n Ni Nj sum date
+             OR
+             insert2 Ni Nj sum date
+    COMMENT: introduce an edge with direction from Ni to Nj with label
+             sum + date if either Ni or Nj does not exist in the graph,
+             do the appropriate node insertion first.
+    EXPECTED OUTPUT:
+    ERROR INDICATION: "IssueWith:" Ni Nj
+
+3.  COMMAND: d Ni [Nj Nk ...]
+             OR
+             delete Ni [Nj Nk ...]
+    COMMENT: delete from graph listed nodes Ni, Nj, Nk, etc
+    EXPECTED OUTPUT:
+    ERROR INDICATION:
+             "Non-existing node(s):" Ni Nk ..
+
+4.  COMMAND: l Ni Nj
+             OR
+             delete2 Ni Nj
+    COMMENT: remove the edge between Ni and Nj; if there are
+	     more than one edges, remove one of the edges.
+    EXPECTED OUTPUT:
+    ERROR INDICATION:
+             "Non-existing node(s):" Ni ..
+
+5.  COMMAND: m Ni Nj sum sum1 date date1
+             OR
+             m(odify) Ni Nj sum sum1 date date1
+    COMMENT: update the values of a specific edge between Ni and Nj
+    EXPECTED OUTPUT:
+    ERROR INDICATION:
+             "Non-existing node(s):" Ni ..
+             OR
+             "Non-existing edge:" Ni Nj sum date"
+
+6.  COMMAND: f Ni
+             OR
+             f(ind) Ni
+    COMMENT: find all outgoing edges from Ni
+    EXPECTED OUTPUT:
+             Ni Nj sum1 date1
+             Ni Nk sum2 date2
+             Ni Nl sum3 date3
+             ...
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+             "Non-existing node:" Ni
+
+7.  COMMAND: r Ni
+             OR
+             receiving Ni
+    COMMENT: find all incoming to Ni edges.
+    EXPECTED OUTPUT:
+             Nj Ni sum1 data1
+             Nl Ni sum2 data2
+             Nl Ni sum3 data3
+             ....
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+             "Non-existing node:" Ni
+
+8.  COMMAND: c Ni
+             OR
+             circlefind Ni
+    COMMENT: find circles Ni is involved in if any
+    EXPECTED OUTPUT:
+             Ni, Nj, Nk, .., Ni
+             Ni, Na, Nb, Nc, ...,Ni
+             ....
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+             "Non-existing node:" Ni
+
+9.  COMMAND: fi Ni k
+             OR
+             findcircles Ni k
+    COMMENT: find circular relationships in which Ni is involved and
+             moves at least k units of funds.
+    EXPECTED OUTPUT:
+             Ni, Nj, Nk, .., Ni m      // m min value found (m>=k)
+             Ni, Na, Nb, Nc, ...,Ni d  // d min value found (d>=k)
+             Ni, Nv, Ni o              // o min value found (o>=k)
+             ....
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+            "Non-existing node:" Ni
+
+10. COMMAND: t Ni m
+             OR
+             traceflow Ni m
+    COMMENT: find all paths of length upto m for which a flow of transfers can
+             be establsihed from Ni
+    EXPECTED OUTPUT:
+             Ni, Nj, Nl, Ny
+             Ni, Nj, Nv
+             Ni, Nj, Nv
+             Ni, Na, Nc, Nb, Nx, Ny
+             ....
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+            "Non-existing node:" Ni
+
+11. COMMAND: o Ni Nj
+             OR
+             connected Ni Nj
+    COMMENT: If exist, present a path (1) between Ni and Nj
+    EXPECTED OUTPUT:
+             Ni, No, .., Nm, Nj // connecting path
+             OR
+             (none) // print nothing
+    ERROR INDICATION:
+             "Non-existing node:" Ni
+             "Non-existing node:" Nj
+
+12. COMMAND: e
+             OR
+             exit
+    COMMENT: terminate the program.
+    EXPECTED OUTPUT:
+             XYZ "Bytes released"
+    ERROR INDICATION:
+             (none)
