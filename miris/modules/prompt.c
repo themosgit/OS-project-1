@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "helper.h"
+#include "../include/helper.h"
 
 int get_int(char** command) {
     char* n = strtok(*command, " ");

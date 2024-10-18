@@ -2,7 +2,7 @@
 // Created by Themos Papatheofanous on 14/10/24.
 //
 #include <stdio.h>
-#include "helper.h"
+#include "../include/helper.h"
 
 int main(){
 

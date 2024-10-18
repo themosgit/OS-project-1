@@ -49,23 +49,23 @@ cmake_ninja_workdir = /Users/themospapatheofanous/CLionProjects/k22_1/cmake-buil
 
 build cmake_object_order_depends_target_k22_1: phony || .
 
-build CMakeFiles/k22_1.dir/miris/main.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/main.c || cmake_object_order_depends_target_k22_1
-  DEP_FILE = CMakeFiles/k22_1.dir/miris/main.c.o.d
+build CMakeFiles/k22_1.dir/miris/modules/main.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/modules/main.c || cmake_object_order_depends_target_k22_1
+  DEP_FILE = CMakeFiles/k22_1.dir/miris/modules/main.c.o.d
   FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/k22_1.dir
-  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris
+  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris/modules
 
-build CMakeFiles/k22_1.dir/miris/prompt.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/prompt.c || cmake_object_order_depends_target_k22_1
-  DEP_FILE = CMakeFiles/k22_1.dir/miris/prompt.c.o.d
+build CMakeFiles/k22_1.dir/miris/modules/prompt.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/modules/prompt.c || cmake_object_order_depends_target_k22_1
+  DEP_FILE = CMakeFiles/k22_1.dir/miris/modules/prompt.c.o.d
   FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/k22_1.dir
-  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris
+  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris/modules
 
-build CMakeFiles/k22_1.dir/miris/helper.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/helper.c || cmake_object_order_depends_target_k22_1
-  DEP_FILE = CMakeFiles/k22_1.dir/miris/helper.c.o.d
+build CMakeFiles/k22_1.dir/miris/modules/graph.c.o: C_COMPILER__k22_1_unscanned_Debug /Users/themospapatheofanous/CLionProjects/k22_1/miris/modules/graph.c || cmake_object_order_depends_target_k22_1
+  DEP_FILE = CMakeFiles/k22_1.dir/miris/modules/graph.c.o.d
   FLAGS = -g -std=gnu11 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/k22_1.dir
-  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris
+  OBJECT_FILE_DIR = CMakeFiles/k22_1.dir/miris/modules
 
 
 # =============================================================================
@@ -75,7 +75,7 @@ build CMakeFiles/k22_1.dir/miris/helper.c.o: C_COMPILER__k22_1_unscanned_Debug /
 #############################################
 # Link the executable k22_1
 
-build k22_1: C_EXECUTABLE_LINKER__k22_1_Debug CMakeFiles/k22_1.dir/miris/main.c.o CMakeFiles/k22_1.dir/miris/prompt.c.o CMakeFiles/k22_1.dir/miris/helper.c.o
+build k22_1: C_EXECUTABLE_LINKER__k22_1_Debug CMakeFiles/k22_1.dir/miris/modules/main.c.o CMakeFiles/k22_1.dir/miris/modules/prompt.c.o CMakeFiles/k22_1.dir/miris/modules/graph.c.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk
   OBJECT_DIR = CMakeFiles/k22_1.dir
   POST_BUILD = :

@@ -4,7 +4,9 @@ project(k22_1 C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(k22_1
-        miris/main.c
-        miris/helper.h
-        miris/prompt.c
-        miris/helper.c)
+        miris/modules/main.c
+        miris/include/helper.h
+        miris/modules/prompt.c
+        miris/modules/graph.c
+        miris/include/graph.h
+)
