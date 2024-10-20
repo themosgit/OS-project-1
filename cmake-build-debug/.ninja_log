@@ -1,5 +1,8 @@
 # ninja log v6
-2	169	1729023570764420701	CMakeFiles/k22_1.dir/miris/prompt.c.o	ebe3068338833a42
-5	140	1728937715575652091	CMakeFiles/k22_1.dir/miris/helper.c.o	dbede27f75c88fc9
-169	264	1729023570931278077	k22_1	8eb348d6beccfd65
-3	177	1729019663497662934	CMakeFiles/k22_1.dir/miris/main.c.o	1ac9bc175ba68234
+1	37	1729462109555151837	CMakeFiles/k22_1.dir/miris/modules/prompt.c.o	cd93085e475e47b0
+2	193	1729464232409212615	CMakeFiles/k22_1.dir/miris/modules/node.c.o	cd8686687513ac95
+2	25	1729461359004019296	CMakeFiles/k22_1.dir/miris/modules/graph.c.o	23f9847798ff4956
+2	36	1729461573219039534	CMakeFiles/k22_1.dir/miris/modules/main.c.o	9a33dd2ddd8ce36
+2	41	1729462049547835521	CMakeFiles/k22_1.dir/miris/modules/graph_2.c.o	277a0fcab31469de
+37	70	1729462109590981500	k22_1	ba5b53b84b4b8ea0
+1	70	1729464625916597192	build.ninja	569336e4af1cc348

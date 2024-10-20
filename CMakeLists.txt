@@ -5,8 +5,10 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(k22_1
         miris/modules/main.c
-        miris/include/helper.h
         miris/modules/prompt.c
-        miris/modules/graph.c
+        miris/include/helper.h
         miris/include/graph.h
+        miris/modules/node.c
+        miris/modules/edge.c
+
 )

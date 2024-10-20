@@ -18,7 +18,7 @@ In case of unrecognized command:
 2.  COMMAND: n Ni Nj sum date
              OR
              insert2 Ni Nj sum date
-    COMMENT: introduce an edge with direction from Ni to Nj with label
+    COMMENT: introduce an incomingEdges with direction from Ni to Nj with label
              sum + date if either Ni or Nj does not exist in the graph,
              do the appropriate node insertion first.
     EXPECTED OUTPUT:
@@ -35,7 +35,7 @@ In case of unrecognized command:
 4.  COMMAND: l Ni Nj
              OR
              delete2 Ni Nj
-    COMMENT: remove the edge between Ni and Nj; if there are
+    COMMENT: remove the incomingEdges between Ni and Nj; if there are
 	     more than one edges, remove one of the edges.
     EXPECTED OUTPUT:
     ERROR INDICATION:
@@ -44,12 +44,12 @@ In case of unrecognized command:
 5.  COMMAND: m Ni Nj sum sum1 date date1
              OR
              m(odify) Ni Nj sum sum1 date date1
-    COMMENT: update the values of a specific edge between Ni and Nj
+    COMMENT: update the values of a specific incomingEdges between Ni and Nj
     EXPECTED OUTPUT:
     ERROR INDICATION:
              "Non-existing node(s):" Ni ..
              OR
-             "Non-existing edge:" Ni Nj sum date"
+             "Non-existing incomingEdges:" Ni Nj sum date"
 
 6.  COMMAND: f Ni
              OR

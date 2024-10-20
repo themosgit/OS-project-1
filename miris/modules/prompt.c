@@ -16,7 +16,7 @@ int get_int(char** command) {
 }
 
 
-int commandPrompt(char* command) {
+int commandPrompt(char* command, Graph graph) {
     char cmd[11], date[10], date1[10];
     int node, node1, sum, sum1, k, m;
 
@@ -28,12 +28,10 @@ int commandPrompt(char* command) {
         node = get_int(&command);                           // with specific INT ids.
         while (node != -1) {
             if (node) {
-                //insert_node()
-                printf("%d ", node);
+                insert_node(graph, node);
             }
             node = get_int(&command);
         }
-        printf("\n");
 
     } else if (!strcmp(cmd,"n") || !strcmp(cmd, "insert2")) {       //insert2
         node = get_int(&command);
