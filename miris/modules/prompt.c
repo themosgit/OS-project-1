@@ -25,12 +25,15 @@ int commandPrompt(char* command, Graph graph) {
     command += strlen(cmd) + 1;
 
     if (!strcmp(cmd,"i") || !strcmp(cmd, "insert")) {       //insert into the graph structure 1 or more nodes
-        node = get_int(&command);                           // with specific INT ids.
-        while (node != -1) {
-            if (node) {
-                insert_node(graph, node);
+        node = get_int(&command);// with specific INT ids.
+        if (node == -1){
+            printf("EXPECTED: insert Ni [Nj Nk ...] with nodes of type int\n");
+        } else {
+            while (node != -1) {
+                if(insert_node(graph, node)) printf("%d inserted\n", node);
+                else printf("%d already in graph\n", node);
+                node = get_int(&command);
             }
-            node = get_int(&command);
         }
 
     } else if (!strcmp(cmd,"n") || !strcmp(cmd, "insert2")) {       //insert2
@@ -40,29 +43,33 @@ int commandPrompt(char* command, Graph graph) {
         sscanf(command, "%s", date);
         if ((node && node1 && sum) &&
             (date[4] == '-' && date[7] == '-')) {
-            //insert_edge()
+            insert_edge(graph, node, node1, sum, date);
+            printf("Successfully inserted edge\n");
         } else {
-            printf("Incorrect input\n");
+            printf("EXPECTED: insert2 Ni Nj sum date\n with nodes and sum of type int and date YYYY-MM-DD\n");
         }
 
     } else if (!strcmp(cmd,"d") || !strcmp(cmd, "delete")) {        //delete
         node = get_int(&command);
-        while (node != -1) {
-            if (node) {
-                //remove_node()
-                printf("%d ", node);
+        if (node == -1){
+            printf("EXPECTED: delete Ni [Nj Nk ...] with nodes of type int\n");
+        } else {
+            while (node != -1) {
+                if (remove_node(graph, node)) printf("%d deleted\n", node);
+                else printf("%d not in graph\n", node);
+                node = get_int(&command);
             }
-            node = get_int(&command);
         }
-        printf("\n");
 
     } else if (!strcmp(cmd,"l") || !strcmp(cmd, "delete2")) {       //delete2
         node = get_int(&command);
         node1 = get_int(&command);
-        if (node && node1) {
-            //remove_edge()
+        if (node != -1 && node1 != -1){
+            remove_edge(graph, node, node1);
+            printf("Successfully deleted edge\n");
+        } else{
+            printf("EXPECTED: delete2 Ni Nj\n With Ni Nj of type int\n");
         }
-        printf("delete2\n");
 
     } else if (!strcmp(cmd,"m") || !strcmp(cmd, "modify")) {        //modify
         node = get_int(&command);
@@ -74,23 +81,24 @@ int commandPrompt(char* command, Graph graph) {
         if ((node && node1 && sum && sum1) &&
             (date[4] == '-' && date[7] == '-') &&
             (date1[4] =='-' && date[7] == '-')) {
-            //change_edge()
+            if (modify(graph, node, node1, sum, sum1, date, date1)){
+                printf("Successfully modified edge\n");
+            }
+        } else {
+            printf("EXPECTED: modify Ni Nj sum sum1 date date1\n with nodes and sums of type int and dates YYYY-MM-DD");
         }
-        printf("modify\n");
 
     } else if (!strcmp(cmd,"f") || !strcmp(cmd, "find")) {          //find
         node = get_int(&command);
-        if (node){
-            //find_outgoing_edges()
+        if (node != -1){
+            printEdges(graph, node);
         }
-        printf("find\n");
 
     } else if (!strcmp(cmd,"r") || !strcmp(cmd, "receiving")) {     //receiving
         node = get_int(&command);
         if (node){
-            //find_incoming_edges()
+            printIncomingEdges(graph, node);
         }
-        printf("receiving\n");
 
     } else if (!strcmp(cmd,"c") || !strcmp(cmd, "circlefind")) {    //circlefind
         node = get_int(&command);

@@ -1,0 +1,27 @@
+
+CC = gcc
+CFLAGS = -Wall -Iinclude
+
+
+SOURCE = modules/main.c modules/node.c modules/prompt.c
+HEADER = include/header.h include/graph.h
+OBJS = modules/main.o modules/node.o modules/prompt.o
+OUT = exe
+
+miris: $(OBJS)
+	$(CC) -g $(OBJS) -o $(OUT)
+
+
+modules/main.o: modules/main.c
+				$(CC) $(FLAGS) main.c
+modules/node.o: modules/node.c
+				$(CC) $(FLAGS) node.c
+modules/prompt.o: modules/prompt.c
+				$(CC) $(FLAGS) prompt.c
+
+
+clean:
+	rm -f $(OBJS) $(OUT)
+
+count:
+	wc $(SOURCE) $(HEADER)
