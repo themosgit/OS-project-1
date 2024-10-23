@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
         printf("Ouput file could not be opened\n");
         exit(1);
     }
+
     Graph graph = graph_create();
     char str[40], date[10];
     char* stri;
@@ -30,12 +31,19 @@ int main(int argc, char* argv[]){
         insert_edge(graph, src, dest, sum, date);
     }
 
-
+    fclose(input);
     char command[50];
     do{
         printf("miris $");
         fgets(command, sizeof(command), stdin);
     }while(commandPrompt(command, graph)); // on exit the commandPrompt function returns 0
+
+    write_graph_to_file(graph, output);
+    fclose(output);
+    return 0;
+
+
+
 
 }
 

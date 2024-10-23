@@ -14,7 +14,8 @@ int get_int(char** command) {
 
 
 int commandPrompt(char* command, Graph graph) {
-    char cmd[11], date[10], date1[10], DATE[10];
+    char cmd[11], DATE[10];
+    char date1[10], date2[10];
     int node, node1, sum, sum1, k, m;
 
     command[strlen(command) - 1] = '\0';
@@ -37,10 +38,10 @@ int commandPrompt(char* command, Graph graph) {
         node = get_int(&command);
         node1 = get_int(&command);
         sum = get_int(&command);
-        sscanf(command, "%s", date);
+        sscanf(command, "%s", date1);
         if ((node && node1 && sum) &&
-            (date[4] == '-' && date[7] == '-')) {
-            insert_edge(graph, node, node1, sum, date);
+            (date1[4] == '-' && date1[7] == '-')) {
+            insert_edge(graph, node, node1, sum, date1);
             printf("Successfully inserted edge\n");
         } else {
             printf("EXPECTED: insert2 Ni Nj sum date\n with nodes and sum of type int and date YYYY-MM-DD\n");
@@ -73,13 +74,14 @@ int commandPrompt(char* command, Graph graph) {
         node1 = get_int(&command);
         sum = get_int(&command);
         sum1 = get_int(&command);
-        sscanf(command, "%s %s", date, date1);
-        printf("date give: %s\n", date);
+        printf("%s\n",command);
+        sscanf(command, "%s %s", date1, date2);
+        printf("date give: %s\n", date1);
         if ((node && node1 && sum && sum1) &&
-            (date[4] == '-' && date[7] == '-') &&
-            (date1[4] =='-' && date1[7] == '-')) {
+            (date1[4] == '-' && date1[7] == '-') &&
+            (date2[4] =='-' && date2[7] == '-')) {
 
-            if (modify(graph, node, node1, sum, sum1, date, date1)){
+            if (modify(graph, node, node1, sum, sum1, date1, date2)){
                 printf("Successfully modified edge\n");
             }
         } else {

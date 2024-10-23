@@ -203,7 +203,14 @@ int insert_node(Graph graph, int id){
 int remove_node(Graph graph, int id){
     GraphNode node = find_node(graph, id);
     if (node == NULL) return 0;
-   // free(node->edges);
+    int check;
+    IncommingNode inNode = node->incoming;
+    Edge edge = node->edge;
+    while(edge != NULL) {
+        remove_edge(graph, id, edge->dest);
+        edge = edge->next
+    }
+    free(node->edges);
     //destroy_edges(node->edges);
     //destroy_incomingNodes(node->nodes);
     node->state = DELETED;
@@ -219,7 +226,6 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date){
     if (!node_exists(graph, dest)){
         insert_node(graph, dest);
     }
-    printf("date give: %s\n", date);
     Edge edge = malloc(sizeof(struct edge));
     strcpy(edge->date, date);
     edge->weight = weight;
@@ -232,21 +238,23 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date){
 
 }
 
-void remove_edge(Graph graph, int src, int dest){
+int remove_edge(Graph graph, int src, int dest){
     if (!node_exists(graph,src)){
         printf("Node: %d does not exist please try again\n", src);
-        return;
+        return 0;
     }
     if (!node_exists(graph, dest)){
         printf("Node: %d does not exist please try again\n", dest);
-        return;
+        return 0;
     }
     Edge currentEdge = find_node(graph, src)->edges;
-    if(currentEdge == find_node(graph, src)->edges){
-        find_node(graph, src)->edges = currentEdge->nextEdge;
+    if(currentEdge == NULL) return 0;
+
+    if(currentEdge->nextEdge == NULL) {
+        find_node(graph, src)->edges = NULL;
         removeIncoming(find_node(graph, dest), src);
         free(currentEdge);
-        return;
+        return 1;
     }
     Edge previousEdge;
     while(currentEdge != NULL){
@@ -255,7 +263,7 @@ void remove_edge(Graph graph, int src, int dest){
             previousEdge = currentEdge->nextEdge;
             removeIncoming(find_node(graph, dest), src);
             free(currentEdge);
-            return;
+            return 1;
 
         } else {
             currentEdge = currentEdge->nextEdge;
@@ -401,4 +409,32 @@ void destroy_incomingNodes(incomingNodes node){
         node = node->next;
 
     }
+}
+
+void write_graph_to_file(Graph graph, FILE* ptr){
+    char str[50];
+    Edge edge;
+    if (graph->old_capacity != 0){
+        for (int i = 0; i < graph->old_capacity; ++i) {
+            if (graph->old_hash_table[i].state == OCCUPIED){
+                edge = graph->old_hash_table[i].edges;
+                while(edge != NULL) {
+                    sprintf(str, "%d %d %d %s\n", graph->old_hash_table[i].id, edge->dest, edge->weight, edge->date);
+                    fputs(str, ptr);
+                    edge = edge->nextEdge;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < graph->capacity; ++i) {
+        if (graph->hash_table[i].state == OCCUPIED){
+            edge = graph->hash_table[i].edges;
+            while(edge != NULL) {
+                sprintf(str, "%d %d %d %s\n", graph->hash_table[i].id, edge->dest, edge->weight, edge->date);
+                fputs(str, ptr);
+                edge = edge->nextEdge;
+            }
+        }
+    }
+
 }
