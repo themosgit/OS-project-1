@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../include/helper.h"
+#include "helper.h"
 
 
 int prime_sizes[] = {53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241,
@@ -11,6 +11,9 @@ typedef enum {
     EMPTY, OCCUPIED, DELETED
 } State;
 
+typedef enum {
+    UNVISITED, VISITING, VISITED
+} DFS;
 #define MAX_LOAD_FACTOR 0.5
 
 struct graph{
@@ -31,22 +34,8 @@ struct graph_node{
     Edge edges;
     incomingNodes nodes;
     State state;
+    DFS status;
 };
-
-struct edge{
-    Edge nextEdge;
-    int dest;
-    int weight;
-    char date[10];
-};
-
-struct incoming_nodes{
-    int id;
-    int occurrences;
-    incomingNodes next;
-};
-
-
 
 Graph graph_create(){
     Graph graph = malloc(sizeof(*graph));
@@ -125,18 +114,16 @@ void graph_destroy(Graph graph) {
         for (int i = 0; i < graph->old_capacity; i++) {
             if (graph->old_size == 0) break;
             if (graph->old_hash_table[i].state == OCCUPIED) {
-                destroy_edges(graph->old_hash_table[i].edges);
-                destroy_incomingNodes(graph->old_hash_table[i].nodes);
+                remove_node(graph, graph->hash_table[i].id);
             }
         }
         free(graph->old_hash_table);
     }
+
     for (int i = 0; i < graph->capacity; i++) {
         if (graph->size == 0) break;
         if (graph->hash_table[i].state == OCCUPIED){
-            destroy_edges(graph->hash_table[i].edges);
-            destroy_incomingNodes(graph->hash_table[i].nodes);
-
+            remove_node(graph, graph->hash_table[i].id);
         }
     }
     free(graph->hash_table);
@@ -203,182 +190,24 @@ int insert_node(Graph graph, int id){
 int remove_node(Graph graph, int id){
     GraphNode node = find_node(graph, id);
     if (node == NULL) return 0;
-    int check;
-    IncommingNode inNode = node->incoming;
-    Edge edge = node->edge;
+    Edge edge = node->edges;
     while(edge != NULL) {
-
-        remove_edge(graph, id, edge->dest);
-        edge = edge->next
+        remove_edge(graph, id, (int)edge->dest);
+        edge = node->edges;
     }
     free(node->edges);
-    //destroy_edges(node->edges);
-    //destroy_incomingNodes(node->nodes);
+    incomingNodes inNode = node->nodes;
+    while(inNode != NULL){
+        remove_edge(graph, inNode->id, id);
+        inNode = node->nodes;
+    }
+    free(node->edges);
     node->state = DELETED;
     graph->size--;
     return 1;
-    //needs to remove incoming edgesa
 }
 
-void insert_edge(Graph graph, int src, int dest, int weight, char* date){
-    if (!node_exists(graph, src)){
-        insert_node(graph, src);
-    }
-    if (!node_exists(graph, dest)){
-        insert_node(graph, dest);
-    }
-    Edge edge = malloc(sizeof(struct edge));
-    strcpy(edge->date, date);
-    edge->weight = weight;
-    edge->dest = dest;
-    GraphNode node = find_node(graph, src);
-    edge->nextEdge = node->edges;
-    node->edges = edge;
-    node = find_node(graph,dest);
-    addIncoming(node, src);
 
-}
-
-int remove_edge(Graph graph, int src, int dest){
-    if (!node_exists(graph,src)){
-        printf("Node: %d does not exist please try again\n", src);
-        return 0;
-    }
-    if (!node_exists(graph, dest)){
-        printf("Node: %d does not exist please try again\n", dest);
-        return 0;
-    }
-    Edge currentEdge = find_node(graph, src)->edges;
-    if(currentEdge == NULL) return 0;
-
-    if(currentEdge->nextEdge == NULL) {
-        find_node(graph, src)->edges = NULL;
-        removeIncoming(find_node(graph, dest), src);
-        free(currentEdge);
-        return 1;
-    }
-    Edge previousEdge;
-    while(currentEdge != NULL){
-        previousEdge = currentEdge;
-        if (currentEdge->dest == dest){
-            previousEdge = currentEdge->nextEdge;
-            removeIncoming(find_node(graph, dest), src);
-            free(currentEdge);
-            return 1;
-
-        } else {
-            currentEdge = currentEdge->nextEdge;
-        }
-    }
-}
-
-Edge search_edge(Graph graph,  int src, int dest, int weight, char* date){
-    if (!node_exists(graph, src) || !node_exists(graph, dest)) return NULL;
-    Edge index = find_node(graph, src)->edges;
-
-    while(index != NULL){
-        if (index->dest == dest && index->weight == weight
-            && strcmp(index->date, date) == 0)  {
-            return index;
-        }
-        index = index->nextEdge;
-    }
-    return NULL;
-}
-
-int modify(Graph graph, int src, int dest, int weight, int newWeight, char* date, char* newDate){
-    if (!node_exists(graph, src)){
-        printf("Node: %d does not exist\n", src);
-        return 0;
-    }
-    if (!node_exists(graph, dest)){
-        printf("Node: %d does not exist\n", dest);
-        return 0;
-    }
-    printf("date give: %s\n", newDate);
-    Edge edge = search_edge(graph, src, dest, weight, date);
-    if (edge == NULL){
-        printf("Edge does not exist\n");
-        return 0;
-    }
-    edge->weight = newWeight;
-    strcpy(edge->date, newDate);
-    return 1;
-}
-
-void printEdges(Graph graph, int id){
-    if (!node_exists(graph, id)){
-        printf("Node: %d does not exist\n", id);
-        return;
-    }
-    Edge edge = find_node(graph, id)->edges;
-    while (edge != NULL){
-        printf("%d %d %d %s\n", id, edge->dest, edge->weight, edge->date);
-        edge = edge->nextEdge;
-    }
-}
-
-void addIncoming(GraphNode destNode, int src_of_edge){
-    incomingNodes inNode = incomingNodes_find(destNode, src_of_edge);
-    if (inNode == NULL){
-        inNode = malloc(sizeof(struct incoming_nodes));
-        inNode->next = destNode->nodes;
-        inNode->id = src_of_edge;
-        inNode->occurrences = 1;
-        destNode->nodes = inNode;
-    } else{
-        inNode->occurrences++;
-    }
-}
-
-void removeIncoming(GraphNode destNode, int src_of_edge){
-    incomingNodes inNode =  incomingNodes_find(destNode, src_of_edge);
-    inNode->occurrences--;
-    if (inNode->occurrences > 0) return;
-    if (destNode->nodes == inNode) {
-        destNode->nodes = inNode->next;
-        free(inNode);
-        return;
-    }
-    incomingNodes inNode_prev = destNode->nodes;
-    while(inNode_prev->next != inNode){
-        inNode_prev = inNode_prev->next;
-    }
-    inNode_prev->next = inNode->next;
-    free(inNode);
-}
-
-incomingNodes incomingNodes_find(GraphNode node, int target_id){
-    incomingNodes index = node->nodes;
-    while(index != NULL){
-        if (index->id == target_id) return index;
-        index = index->next;
-    }
-    return NULL;
-}
-
-void printIncomingEdges(Graph graph, int dest_id){
-    GraphNode node = find_node(graph, dest_id);
-    if (node == NULL){
-        printf("Node: %d does not exist\n", dest_id);
-        return;
-    }
-    incomingNodes index = node->nodes;
-    Edge incomingEdge;
-    while (index != NULL) {
-        int i = index->occurrences;
-        incomingEdge = find_node(graph, index->id)->edges;
-        while(i > 0){
-            if (incomingEdge == NULL) exit(66);
-            if (incomingEdge->dest == node->id){
-                printf("%d %d %d %s\n", index->id,incomingEdge->dest, incomingEdge->weight, incomingEdge->date);
-                i--;
-            }
-            incomingEdge = incomingEdge->nextEdge;
-        }
-        index = index->next;
-    }
-}
 
 int test_hash(int value){
     return value;
@@ -437,5 +266,45 @@ void write_graph_to_file(Graph graph, FILE* ptr){
             }
         }
     }
+}
 
+int dfs(Graph graph, GraphNode node, int* stack, int* path, int index, int startNode){
+    if (node->status == VISITING) {
+        printf("Cycle found: ");
+        for (int i = index; i >= 0; ++i) {
+            printf("%d ", path[i]);
+            if (path[i] == startNode) {
+                printf("\n");
+                return 1;
+            }
+        }
+    } else if (node->status == VISITED) return 0;
+
+    node->status = VISITING;
+    stack[node->id] = 1;
+    path[index] = node->id;
+
+    Edge edge = node->edges;
+    while (edge != NULL){
+        index++;
+        GraphNode nextNode = find_node(graph, edge->dest);
+        if (dfs(graph, nextNode, stack, path, index , startNode)) return 1;
+        edge = edge->nextEdge;
+    }
+
+    node->status =  VISITED;
+    stack[node->id] = 0;
+    return 0;
+}
+
+void circleFind(Graph graph, int startNode){
+    int stack[10000] = {0};
+    int path[10000];
+    memset(path, -1, sizeof(path));
+
+    for(int i = 0; i < graph->capacity; i ++){
+        graph->hash_table[i].status = UNVISITED;
+    }
+
+    dfs(graph, find_node(graph, startNode), stack, path, 0, startNode);
 }

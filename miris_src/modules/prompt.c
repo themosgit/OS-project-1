@@ -15,8 +15,7 @@ int get_int(char** command) {
 
 
 int commandPrompt(char* command, Graph graph) {
-    char cmd[11], DATE[10];
-    char date1[10], date2[10];
+    char cmd[11], date1[10], date2[10];
     int node, node1, sum, sum1, k, m;
 
     command[strlen(command) - 1] = '\0';
@@ -75,13 +74,11 @@ int commandPrompt(char* command, Graph graph) {
         node1 = get_int(&command);
         sum = get_int(&command);
         sum1 = get_int(&command);
-        printf("%s\n",command);
         sscanf(command, "%s %s", date1, date2);
-        printf("date give: %s\n", date1);
+        date1[0] = '2';
         if ((node && node1 && sum && sum1) &&
             (date1[4] == '-' && date1[7] == '-') &&
             (date2[4] =='-' && date2[7] == '-')) {
-
             if (modify(graph, node, node1, sum, sum1, date1, date2)){
                 printf("Successfully modified edge\n");
             }
@@ -104,7 +101,7 @@ int commandPrompt(char* command, Graph graph) {
     } else if (!strcmp(cmd,"c") || !strcmp(cmd, "circlefind")) {    //circlefind
         node = get_int(&command);
         if (node) {
-            //find_circle()
+            circleFind(graph, node);
         }
         printf("circleFind\n");
 
@@ -112,7 +109,7 @@ int commandPrompt(char* command, Graph graph) {
         node = get_int(&command);
         k = get_int(&command);
         if (node && k){
-            //find_circles()
+           //circleFind(graph,)
         }
         printf("findCircles\n");
 
@@ -132,7 +129,7 @@ int commandPrompt(char* command, Graph graph) {
         printf("connected\n");
 
     } else if(!strcmp(cmd,"e") || !strcmp(cmd, "exit")) {            //exit
-        printf("exiting..");
+        printf("exiting...\n");
         return 0;
     } else {
         printf("Unrecognized command\n");

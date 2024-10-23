@@ -51,7 +51,7 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date);
 
 int remove_node(Graph graph, int id);
 
-int remove_edge(Graph, int src, int dest);
+void remove_edge(Graph, int src, int dest);
 
 int modify(Graph graph, int src, int dest, int weight, int newWeight, char* date, char* newDate);
 
