@@ -37,7 +37,7 @@ struct edge{
     Edge nextEdge;
     int dest;
     int weight;
-    char* date;
+    char date[10];
 };
 
 struct incoming_nodes{
@@ -111,7 +111,7 @@ void increment_rehash(Graph graph){
             graph->hash_table[pos].edges = graph->old_hash_table[currentIndex].edges;
             graph->hash_table[pos].nodes = graph->old_hash_table[currentIndex].nodes;
             graph->hash_table[pos].state = OCCUPIED;
-            graph->old_hash_table[currentIndex].state = EMPTY;
+            graph->old_hash_table[currentIndex].state = DELETED;
             graph->size++;
             graph->old_size--;
         }
@@ -161,7 +161,7 @@ GraphNode find_node(Graph graph, int id){
                 return &graph->old_hash_table[old_pos];
             }
             old_pos = (old_pos + 1) % graph->old_capacity;
-            if (count == graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) stop = 1;
+            if (count >= graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) old_stop = 1;
         }
         if (!stop) {
             if (graph->hash_table[pos].state == OCCUPIED
@@ -177,13 +177,14 @@ GraphNode find_node(Graph graph, int id){
 }
 
 int insert_node(Graph graph, int id){
+
     GraphNode node = find_node(graph, id);
     if (node != NULL) return 0;
 
     increment_rehash(graph);
     int pos;
     for (pos = graph->hash(id) % graph->capacity;
-        graph->hash_table[pos].state != EMPTY;
+        graph->hash_table[pos].state != EMPTY && graph->hash_table[pos].state != DELETED;
         pos = (pos + 1) % graph->capacity);
     node = &graph->hash_table[pos];
     node->state = OCCUPIED;
@@ -202,10 +203,10 @@ int insert_node(Graph graph, int id){
 int remove_node(Graph graph, int id){
     GraphNode node = find_node(graph, id);
     if (node == NULL) return 0;
-    free(node->edges);
-    destroy_edges(node->edges);
-    destroy_incomingNodes(node->nodes);
-    node->state = EMPTY;
+   // free(node->edges);
+    //destroy_edges(node->edges);
+    //destroy_incomingNodes(node->nodes);
+    node->state = DELETED;
     graph->size--;
     return 1;
     //needs to remove incoming edgesa
@@ -218,9 +219,10 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date){
     if (!node_exists(graph, dest)){
         insert_node(graph, dest);
     }
+    printf("date give: %s\n", date);
     Edge edge = malloc(sizeof(struct edge));
+    strcpy(edge->date, date);
     edge->weight = weight;
-    edge->date = date;
     edge->dest = dest;
     GraphNode node = find_node(graph, src);
     edge->nextEdge = node->edges;
@@ -246,8 +248,9 @@ void remove_edge(Graph graph, int src, int dest){
         free(currentEdge);
         return;
     }
-    Edge previousEdge = currentEdge;
+    Edge previousEdge;
     while(currentEdge != NULL){
+        previousEdge = currentEdge;
         if (currentEdge->dest == dest){
             previousEdge = currentEdge->nextEdge;
             removeIncoming(find_node(graph, dest), src);
@@ -255,7 +258,6 @@ void remove_edge(Graph graph, int src, int dest){
             return;
 
         } else {
-            previousEdge = currentEdge;
             currentEdge = currentEdge->nextEdge;
         }
     }
@@ -284,13 +286,14 @@ int modify(Graph graph, int src, int dest, int weight, int newWeight, char* date
         printf("Node: %d does not exist\n", dest);
         return 0;
     }
+    printf("date give: %s\n", newDate);
     Edge edge = search_edge(graph, src, dest, weight, date);
     if (edge == NULL){
         printf("Edge does not exist\n");
         return 0;
     }
     edge->weight = newWeight;
-    edge->date = newDate;
+    strcpy(edge->date, newDate);
     return 1;
 }
 
@@ -348,7 +351,7 @@ incomingNodes incomingNodes_find(GraphNode node, int target_id){
 void printIncomingEdges(Graph graph, int dest_id){
     GraphNode node = find_node(graph, dest_id);
     if (node == NULL){
-        printf("Node: %d does not exist\n");
+        printf("Node: %d does not exist\n", dest_id);
         return;
     }
     incomingNodes index = node->nodes;
@@ -393,7 +396,9 @@ void destroy_edges(Edge edge){
 void destroy_incomingNodes(incomingNodes node){
     incomingNodes index;
     while(node != NULL){
+        free(index);
         index = node;
         node = node->next;
+
     }
 }

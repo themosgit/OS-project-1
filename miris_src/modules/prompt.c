@@ -1,6 +1,3 @@
-//
-// Created by Themos Papatheofanous on 14/10/24.
-//
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,7 +14,7 @@ int get_int(char** command) {
 
 
 int commandPrompt(char* command, Graph graph) {
-    char cmd[11], date[10], date1[10];
+    char cmd[11], date[10], date1[10], DATE[10];
     int node, node1, sum, sum1, k, m;
 
     command[strlen(command) - 1] = '\0';
@@ -76,16 +73,17 @@ int commandPrompt(char* command, Graph graph) {
         node1 = get_int(&command);
         sum = get_int(&command);
         sum1 = get_int(&command);
-        sscanf(command, "%s", date);
-        sscanf(command, "%s", date1);
+        sscanf(command, "%s %s", date, date1);
+        printf("date give: %s\n", date);
         if ((node && node1 && sum && sum1) &&
             (date[4] == '-' && date[7] == '-') &&
-            (date1[4] =='-' && date[7] == '-')) {
+            (date1[4] =='-' && date1[7] == '-')) {
+
             if (modify(graph, node, node1, sum, sum1, date, date1)){
                 printf("Successfully modified edge\n");
             }
         } else {
-            printf("EXPECTED: modify Ni Nj sum sum1 date date1\n with nodes and sums of type int and dates YYYY-MM-DD");
+            printf("EXPECTED: modify Ni Nj sum sum1 date date1\n with nodes and sums of type int and dates YYYY-MM-DD\n");
         }
 
     } else if (!strcmp(cmd,"f") || !strcmp(cmd, "find")) {          //find
