@@ -161,7 +161,7 @@ GraphNode find_node(Graph graph, int id){
                 return &graph->old_hash_table[old_pos];
             }
             old_pos = (old_pos + 1) % graph->old_capacity;
-            if (count >= graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) old_stop = 1;
+            if (count == graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) old_stop = 1;
         }
         if (!stop) {
             if (graph->hash_table[pos].state == OCCUPIED
