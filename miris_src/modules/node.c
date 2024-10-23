@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "helper.h"
+#include "graph.h"
 
 
 int prime_sizes[] = {53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241,
@@ -15,6 +15,7 @@ typedef enum {
     UNVISITED, VISITING, VISITED
 } DFS;
 #define MAX_LOAD_FACTOR 0.5
+
 
 struct graph{
     GraphNode hash_table;
@@ -54,6 +55,106 @@ Graph graph_create(){
     graph->rehashing_index = 0;
 
     return graph;
+}
+
+
+void graph_destroy(Graph graph) {
+    if (graph->old_capacity != 0) {
+        for (int i = 0; i < graph->old_capacity; i++) {
+            if (graph->old_size == 0) break;
+            if (graph->old_hash_table[i].state == OCCUPIED) {
+                remove_node(graph, graph->hash_table[i].id);
+            }
+        }
+        free(graph->old_hash_table);
+    }
+
+    for (int i = 0; i < graph->capacity; i++) {
+        if (graph->size == 0) break;
+        if (graph->hash_table[i].state == OCCUPIED){
+            remove_node(graph, graph->hash_table[i].id);
+        }
+    }
+    free(graph->hash_table);
+    free(graph);
+}
+
+int insert_node(Graph graph, int id){
+
+    GraphNode node = find_node(graph, id);
+    if (node != NULL) return 0;
+
+    increment_rehash(graph);
+    int pos;
+    for (pos = graph->hash(id) % graph->capacity;
+        graph->hash_table[pos].state != EMPTY && graph->hash_table[pos].state != DELETED;
+        pos = (pos + 1) % graph->capacity);
+    node = &graph->hash_table[pos];
+    node->state = OCCUPIED;
+    node->id = id;
+    node->edges = NULL;
+    node->nodes = NULL;
+    graph->size++;
+    float load_factor = (float)(graph->size / graph->capacity);
+    if (load_factor > MAX_LOAD_FACTOR){
+        hash_table_size_increase(graph);
+        //ισως χρειαζεται και εδω ενα increment rehash
+    }
+    return 1;
+}
+
+int remove_node(Graph graph, int id){
+    GraphNode node = find_node(graph, id);
+    if (node == NULL) return 0;
+    Edge edge = node->edges;
+    while(edge != NULL) {
+        remove_edge(graph, id, returnEdgeDest(edge));
+        edge = node->edges;
+    }
+    free(node->edges);
+    incomingNodes inNode = node->nodes;
+    while(inNode != NULL){
+        remove_edge(graph, returnInNodeId(inNode), id);
+        inNode = node->nodes;
+    }
+    free(node->edges);
+    node->state = DELETED;
+    graph->size--;
+    return 1;
+}
+
+
+GraphNode find_node(Graph graph, int id){
+    int old_pos, old_stop;
+    if (graph->old_capacity != 0){
+        old_pos = graph->hash(id) % graph->old_capacity;
+        old_stop = 0;
+    } else{
+        old_stop = 1;
+    }
+    int pos = graph->hash(id) % graph->capacity;
+    int stop = 0;
+    int count = 0;
+    while (!stop || !old_stop){
+        if (!old_stop) {
+            if (graph->old_hash_table[old_pos].state == OCCUPIED
+                && graph->old_hash_table[old_pos].id == id) {
+                return &graph->old_hash_table[old_pos];
+            }
+            old_pos = (old_pos + 1) % graph->old_capacity;
+            if (count == graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) old_stop = 1;
+        }
+        if (!stop) {
+            if (graph->hash_table[pos].state == OCCUPIED
+                && graph->hash_table[pos].id == id) {
+                return &graph->hash_table[pos];
+            }
+            pos = (pos + 1) % graph->capacity;
+            if (count == graph->capacity || graph->hash_table[pos].state == EMPTY) stop = 1;
+        }
+        count++;
+    }
+    return NULL;
 }
 
 void hash_table_size_increase(Graph graph){
@@ -109,110 +210,6 @@ void increment_rehash(Graph graph){
     graph->rehashing_index += 2;
 }
 
-void graph_destroy(Graph graph) {
-    if (graph->old_capacity != 0) {
-        for (int i = 0; i < graph->old_capacity; i++) {
-            if (graph->old_size == 0) break;
-            if (graph->old_hash_table[i].state == OCCUPIED) {
-                remove_node(graph, graph->hash_table[i].id);
-            }
-        }
-        free(graph->old_hash_table);
-    }
-
-    for (int i = 0; i < graph->capacity; i++) {
-        if (graph->size == 0) break;
-        if (graph->hash_table[i].state == OCCUPIED){
-            remove_node(graph, graph->hash_table[i].id);
-        }
-    }
-    free(graph->hash_table);
-    free(graph);
-}
-
-GraphNode find_node(Graph graph, int id){
-    int old_pos, old_stop;
-    if (graph->old_capacity != 0){
-        old_pos = graph->hash(id) % graph->old_capacity;
-        old_stop = 0;
-    } else{
-        old_stop = 1;
-    }
-    int pos = graph->hash(id) % graph->capacity;
-    int stop = 0;
-    int count = 0;
-    while (!stop || !old_stop){
-        if (!old_stop) {
-            if (graph->old_hash_table[old_pos].state == OCCUPIED
-                && graph->old_hash_table[old_pos].id == id) {
-                return &graph->old_hash_table[old_pos];
-            }
-            old_pos = (old_pos + 1) % graph->old_capacity;
-            if (count == graph->old_capacity || graph->old_hash_table[old_pos].state == EMPTY) old_stop = 1;
-        }
-        if (!stop) {
-            if (graph->hash_table[pos].state == OCCUPIED
-                && graph->hash_table[pos].id == id) {
-                return &graph->hash_table[pos];
-            }
-            pos = (pos + 1) % graph->capacity;
-            if (count == graph->capacity || graph->hash_table[pos].state == EMPTY) stop = 1;
-        }
-        count++;
-    }
-    return NULL;
-}
-
-int insert_node(Graph graph, int id){
-
-    GraphNode node = find_node(graph, id);
-    if (node != NULL) return 0;
-
-    increment_rehash(graph);
-    int pos;
-    for (pos = graph->hash(id) % graph->capacity;
-        graph->hash_table[pos].state != EMPTY && graph->hash_table[pos].state != DELETED;
-        pos = (pos + 1) % graph->capacity);
-    node = &graph->hash_table[pos];
-    node->state = OCCUPIED;
-    node->id = id;
-    node->edges = NULL;
-    node->nodes = NULL;
-    graph->size++;
-    float load_factor = (float)(graph->size / graph->capacity);
-    if (load_factor > MAX_LOAD_FACTOR){
-        hash_table_size_increase(graph);
-        //ισως χρειαζεται και εδω ενα increment rehash
-    }
-    return 1;
-}
-
-int remove_node(Graph graph, int id){
-    GraphNode node = find_node(graph, id);
-    if (node == NULL) return 0;
-    Edge edge = node->edges;
-    while(edge != NULL) {
-        remove_edge(graph, id, (int)edge->dest);
-        edge = node->edges;
-    }
-    free(node->edges);
-    incomingNodes inNode = node->nodes;
-    while(inNode != NULL){
-        remove_edge(graph, inNode->id, id);
-        inNode = node->nodes;
-    }
-    free(node->edges);
-    node->state = DELETED;
-    graph->size--;
-    return 1;
-}
-
-
-
-int test_hash(int value){
-    return value;
-}
-
 int node_exists(Graph graph, int id){
     GraphNode node = find_node(graph, id);
     if (node == NULL){
@@ -222,24 +219,33 @@ int node_exists(Graph graph, int id){
     }
 }
 
-void destroy_edges(Edge edge){
-    Edge index;
-    while(edge != NULL){
-        index = edge;
-        edge = edge->nextEdge;
-        free(index);
-    }
+
+int test_hash(int value){
+    return value;
 }
 
-void destroy_incomingNodes(incomingNodes node){
-    incomingNodes index;
-    while(node != NULL){
-        free(index);
-        index = node;
-        node = node->next;
-
-    }
+int returnNodeID(GraphNode node){
+    return node->id;
 }
+
+Edge returnEdge(GraphNode node){
+    return node->edges;
+}
+
+void setEdge(Edge edge, GraphNode node){
+    node->edges = edge;
+}
+
+incomingNodes returnInNode(GraphNode node){
+    return node->nodes;
+}
+
+void setInNode(incomingNodes inNode, GraphNode node){
+    node->nodes = inNode;
+}
+
+
+
 
 void write_graph_to_file(Graph graph, FILE* ptr){
     char str[50];
@@ -249,9 +255,9 @@ void write_graph_to_file(Graph graph, FILE* ptr){
             if (graph->old_hash_table[i].state == OCCUPIED){
                 edge = graph->old_hash_table[i].edges;
                 while(edge != NULL) {
-                    sprintf(str, "%d %d %d %s\n", graph->old_hash_table[i].id, edge->dest, edge->weight, edge->date);
+                    sprintf(str, "%d %d %d %s\n", graph->old_hash_table[i].id, returnEdgeDest(edge), returnEdgeWeight(edge), returnEdgeDate(edge));
                     fputs(str, ptr);
-                    edge = edge->nextEdge;
+                    edge = returnNextEdge(edge);
                 }
             }
         }
@@ -260,13 +266,27 @@ void write_graph_to_file(Graph graph, FILE* ptr){
         if (graph->hash_table[i].state == OCCUPIED){
             edge = graph->hash_table[i].edges;
             while(edge != NULL) {
-                sprintf(str, "%d %d %d %s\n", graph->hash_table[i].id, edge->dest, edge->weight, edge->date);
+                sprintf(str, "%d %d %d %s\n", graph->hash_table[i].id, returnEdgeDest(edge), returnEdgeWeight(edge), returnEdgeDate(edge));
                 fputs(str, ptr);
-                edge = edge->nextEdge;
+                edge = returnNextEdge(edge);
             }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
 int dfs(Graph graph, GraphNode node, int* stack, int* path, int index, int startNode){
     if (node->status == VISITING) {
@@ -308,3 +328,4 @@ void circleFind(Graph graph, int startNode){
 
     dfs(graph, find_node(graph, startNode), stack, path, 0, startNode);
 }
+*/

@@ -7,8 +7,8 @@ BINDIR = bin
 
 PROG = ./miris
 
-SOURCE = main.c node.c prompt.c
-HEADER = header.h graph.h
+SOURCE = main.c prompt.c node.c edge.c inNodes.c
+HEADER = header.h graph.h edge.h inNodes.h
 OBJS = $(patsubst %.c, $(BINDIR)/%.o, $(SOURCE))
 
 SRCFILES = $(patsubst %, $(SRCDIR)/%, $(SOURCE))

@@ -101,7 +101,7 @@ int commandPrompt(char* command, Graph graph) {
     } else if (!strcmp(cmd,"c") || !strcmp(cmd, "circlefind")) {    //circlefind
         node = get_int(&command);
         if (node) {
-            circleFind(graph, node);
+          //  circleFind(graph, node);
         }
         printf("circleFind\n");
 

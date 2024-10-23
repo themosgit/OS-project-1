@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "graph.h"
 
 struct edge{
@@ -7,7 +10,7 @@ struct edge{
     char date[10];
 };
 
-void insert_edge(Graph graph, int src, int dest, int weight, char* date){
+void insert_edge(Graph graph, int src, int dest, int weight, char* date) {
     if (!node_exists(graph, src)){
         insert_node(graph, src);
     }
@@ -19,11 +22,10 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date){
     edge->weight = weight;
     edge->dest = dest;
     GraphNode node = find_node(graph, src);
-    edge->nextEdge = node->edges;
-    node->edges = edge;
+    edge->nextEdge = returnEdge(node);
+    setEdge(edge, node);
     node = find_node(graph,dest);
     addIncoming(node, src);
-
 }
 
 void remove_edge(Graph graph, int src, int dest){
@@ -37,11 +39,11 @@ void remove_edge(Graph graph, int src, int dest){
         return;
     }
 
-    Edge currentEdge = find_node(graph, src)->edges;
+    Edge currentEdge = returnEdge(find_node(graph, src));
     if(currentEdge == NULL) return;
 
     if(currentEdge->nextEdge == NULL) {
-        find_node(graph, src)->edges = NULL;
+        setEdge(NULL, find_node(graph, src));
         removeIncoming(find_node(graph, dest), src);
         free(currentEdge);
         return;
@@ -49,7 +51,7 @@ void remove_edge(Graph graph, int src, int dest){
 
 
     if (currentEdge->dest == dest){
-        find_node(graph, src)->edges = currentEdge->nextEdge;
+        setEdge(currentEdge->nextEdge, find_node(graph, src));
         removeIncoming(find_node(graph, dest), src);
         free(currentEdge);
         return;
@@ -72,7 +74,7 @@ void remove_edge(Graph graph, int src, int dest){
 
 Edge search_edge(Graph graph,  int src, int dest, int weight, char* date){
     if (!node_exists(graph, src) || !node_exists(graph, dest)) return NULL;
-    Edge index = find_node(graph, src)->edges;
+    Edge index = returnEdge(find_node(graph, src));
 
     while(index != NULL){
         if (index->dest == dest && index->weight == weight
@@ -108,9 +110,34 @@ void printEdges(Graph graph, int id){
         printf("Node: %d does not exist\n", id);
         return;
     }
-    Edge edge = find_node(graph, id)->edges;
+    Edge edge = returnEdge(find_node(graph, id));
     while (edge != NULL){
         printf("%d %d %d %s\n", id, edge->dest, edge->weight, edge->date);
         edge = edge->nextEdge;
     }
+}
+
+void destroy_edges(Edge edge){
+    Edge index;
+    while(edge != NULL){
+        index = edge;
+        edge = edge->nextEdge;
+        free(index);
+    }
+}
+
+int returnEdgeDest(Edge edge){
+    return edge->dest;
+}
+
+int returnEdgeWeight(Edge edge){
+    return edge->weight;
+}
+
+char* returnEdgeDate(Edge edge){
+    return edge->date;
+}
+
+Edge returnNextEdge(Edge edge){
+    return edge->nextEdge;
 }
