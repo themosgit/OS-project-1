@@ -13,6 +13,7 @@ int get_int(char** command) {
 }
 
 
+
 int commandPrompt(char* command, Graph graph) {
     char cmd[11], DATE[10];
     char date1[10], date2[10];

@@ -10,9 +10,10 @@ int main(int argc, char* argv[]){
     }
     FILE *input = fopen(argv[2], "r");
     if (input == NULL){
-        printf("Input file does not exist\n");
+        printf("Input file does not exist\n ");
         exit(1);
     }
+
     FILE *output = fopen(argv[4], "w");
     if (output == NULL){
         printf("Ouput file could not be opened\n");

@@ -207,6 +207,7 @@ int remove_node(Graph graph, int id){
     IncommingNode inNode = node->incoming;
     Edge edge = node->edge;
     while(edge != NULL) {
+
         remove_edge(graph, id, edge->dest);
         edge = edge->next
     }
