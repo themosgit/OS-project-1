@@ -11,10 +11,6 @@ typedef enum {
     EMPTY, OCCUPIED, DELETED
 } State;
 
-typedef enum {
-    UNVISITED, VISITING, VISITED
-} DFS;
-
 #define MAX_LOAD_FACTOR 0.5
 
 
@@ -36,7 +32,6 @@ struct graph_node{ // δομή node
     Edge edges;
     incomingNodes nodes; // βοηθητική δομή για τις εισερχόμενες ακμές
     State state;
-    DFS dfs;
 };
 
 Graph graph_create(){ // δημιουργία πίνακα κατακερματισμού
@@ -274,28 +269,24 @@ void write_graph_to_file(Graph graph, FILE* ptr){
         }
     }
 }
-
-void circleFind_traceflow_connected(Graph graph, int startNode, int var, int mode) {
-    int *stack;
-    if (mode == 0) stack = malloc(graph->capacity * sizeof(int));
+//συνάρτηση που ετοιμάζει τις απαραίτητες δομές για τις recursive dfs functions
+void dfsUtil(Graph graph, int startNode, int var, int mode) { //mode = 0 circlefind/findCircles
+    int *stack;                                               //mode = 1 traceFlow mode = 2 connected
+    if (mode != 1) stack = malloc(graph->capacity * sizeof(int));
     int* path = malloc(graph->capacity * sizeof(int));
     for (int i = 0; i < graph->capacity; i++) {
-        if (mode == 0) stack[i] = 0;
+        if (mode != 1) stack[i] = 0;
         path[i] = -1;
-        if (i < graph->old_capacity) {
-            graph->old_hash_table[i].dfs = UNVISITED;
-        }
-        graph->hash_table[i].dfs = UNVISITED;
     }
     if (mode == 0) dfs_circleFind(graph, find_node(graph, startNode), stack, path, 0, startNode, var);
     else if (mode == 1) dfs_traceFlow(graph, find_node(graph, startNode), path, 0, var);
-    else if (mode == 2) dfs_connected(graph, find_node(graph, startNode), find_node(graph, var), path, 0);
-    free(stack);
+    else if (mode == 2) dfs_connected(graph, find_node(graph, startNode), find_node(graph, var), path, 0, stack);
+    if(mode != 1) free(stack);
     free(path);
 }
-
+//recursive dfs function για εντοπισμό και εκτύπωση κύκλων
 int dfs_circleFind(Graph graph, GraphNode node, int* stack, int* path, int index, int startNode, int minsum) {
-    if (node->dfs == VISITING) {
+    if (stack[node->id] == 1) {
         printf("Cycle found: ");
         for (int i = index - 1; i >= 0; --i) {
             printf("%d ", path[i]);
@@ -304,26 +295,22 @@ int dfs_circleFind(Graph graph, GraphNode node, int* stack, int* path, int index
                 return 1;
             }
         }
-    } else if (node->dfs == VISITED)  return 0;
-
-    node->dfs = VISITING;
+    }
     stack[node->id] = 1;
     path[index] = node->id;
     Edge edge = node->edges;
     while (edge != NULL) {
         GraphNode nextNode = find_node(graph, returnEdgeDest(edge));
-        if (returnEdgeWeight(edge) >= minsum) {
+        if (returnEdgeWeight(edge) >= minsum) { // έλεγχος μεταβλητής minsum για τη findCircles έχει τιμή -1 στη circleFInd
             if (dfs_circleFind(graph, nextNode, stack, path, index + 1, startNode, minsum)) return 1;
         }
         edge = returnNextEdge(edge);
     }
-
-    node->dfs = VISITED;
     stack[node->id] = 0;
     return 0;
 }
 
-
+//recursive dfs function για εκτύπωση όλων των paths βάθους depth του node
 void dfs_traceFlow(Graph graph, GraphNode node, int* path, int index, int depth) {
     if (index > depth) return;
     path[index] = node->id;
@@ -342,9 +329,11 @@ void dfs_traceFlow(Graph graph, GraphNode node, int* path, int index, int depth)
     }
 }
 
-int dfs_connected(Graph graph, GraphNode node, GraphNode destNode, int* path, int index){
+//recursive dfs function για εντοπίσμο και εκτύπωση σύνδεσης node με destNode
+int dfs_connected(Graph graph, GraphNode node, GraphNode destNode, int *path, int index, int *visited) {
+    visited[node->id] = 1;
     path[index] = node->id;
-    if (node == destNode){
+    if (node == destNode) {
         printf("Connected path: ");
         for (int i = 0; i <= index; i++) {
             printf("%d ", path[i]);
@@ -354,9 +343,12 @@ int dfs_connected(Graph graph, GraphNode node, GraphNode destNode, int* path, in
     }
     Edge edge = node->edges;
     while (edge != NULL) {
-        GraphNode node = find_node(graph, returnEdgeDest(edge));
-        if (dfs_connected(graph, node, destNode, path, index + 1)) return 1;
+        GraphNode nextNode = find_node(graph, returnEdgeDest(edge));
+        if (!visited[nextNode->id]) {
+            if (dfs_connected(graph, nextNode, destNode, path, index + 1, visited)) return 1;
+        }
         edge = returnNextEdge(edge);
     }
+    visited[node->id] = 0;
     return 0;
 }

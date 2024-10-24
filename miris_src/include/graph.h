@@ -42,13 +42,13 @@ void setInNode(incomingNodes inNode, GraphNode node);
 
 void write_graph_to_file(Graph graph, FILE* ptr);
 
-void circleFind_traceflow_connected(Graph graph, int startNode, int var, int mode);
+void dfsUtil(Graph graph, int startNode, int var, int mode);
 
 int dfs_circleFind(Graph graph, GraphNode node, int* stack, int* path, int index, int startNode, int minsum);
 
 void dfs_traceFlow(Graph graph, GraphNode node, int* path, int index, int depth);
 
-int dfs_connected(Graph graph, GraphNode node, GraphNode destNode, int* path, int index);
+int dfs_connected(Graph graph, GraphNode node, GraphNode destNode, int *path, int index, int*visited);
 
 //edge.c funcs
 

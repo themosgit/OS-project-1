@@ -101,30 +101,29 @@ int commandPrompt(char* command, Graph graph) {
     } else if (!strcmp(cmd,"c") || !strcmp(cmd, "circlefind")) {    //circlefind
         node = get_int(&command);
         if (node_exists(graph, node)) {
-            circleFind_traceflow_connected(graph, node, -1, 0);
+            dfsUtil(graph, node, -1, 0);
         }
 
     } else if (!strcmp(cmd,"fi") || !strcmp(cmd, "findCircles")) {  //findCircles
         node = get_int(&command);
         k = get_int(&command);
         if (node_exists(graph, node) && k){
-            circleFind_traceflow_connected(graph, node, k, 0);
+            dfsUtil(graph, node, k, 0);
         }
 
     } else if (!strcmp(cmd,"t") || !strcmp(cmd, "traceflow")) { //traceflow
         node = get_int(&command);
         m = get_int(&command);
         if (node && m){
-            circleFind_traceflow_connected(graph, node, m, 1);
+            dfsUtil(graph, node, m, 1);
         }
 
     } else if (!strcmp(cmd,"o") || !strcmp(cmd, "connected")) {     //connected
         node = get_int(&command);
         node1 = get_int(&command);
         if (node && node1) {
-            circleFind_traceflow_connected(graph, node, node1, 2);
+            dfsUtil(graph, node, node1, 2);
         }
-        printf("connected\n");
 
     } else if(!strcmp(cmd,"e") || !strcmp(cmd, "exit")) {            //exit
         printf("exiting...\n");
@@ -134,15 +133,3 @@ int commandPrompt(char* command, Graph graph) {
     }
     return 1;
 }
-
-
-
-
-/* else if (!strcmp(cmd,"h")) {
-        char str[10];
-        FILE *fp;
-        fp = fopen("help.txt","r");
-        while (fgets(str,10,fp)!=NULL){
-            printf("%s",str);
-        }
-        fclose(fp);*/
