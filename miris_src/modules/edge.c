@@ -3,7 +3,7 @@
 #include <string.h>
 #include "graph.h"
 
-struct edge{
+struct edge{ //δομή ακμών linked list
     Edge nextEdge;
     int dest;
     int weight;
@@ -11,8 +11,8 @@ struct edge{
 };
 
 void insert_edge(Graph graph, int src, int dest, int weight, char* date) {
-    if (!node_exists(graph, src)){
-        insert_node(graph, src);
+    if (!node_exists(graph, src)){ //έλεγχος για ύπαρξη nodes
+        insert_node(graph, src);    //και εισαγωγή τους αν είναι απαραίτητο
     }
     if (!node_exists(graph, dest)){
         insert_node(graph, dest);
@@ -25,10 +25,10 @@ void insert_edge(Graph graph, int src, int dest, int weight, char* date) {
     edge->nextEdge = returnEdge(node);
     setEdge(edge, node);
     node = find_node(graph,dest);
-    addIncoming(node, src);
+    addIncoming(node, src); //ανανέωση βοηθητικής δομής εισερχόμενων ακμών
 }
 
-void remove_edge(Graph graph, int src, int dest){
+void remove_edge(Graph graph, int src, int dest){ // αφαίρεση ακμής
 
     if (!node_exists(graph,src)){
         printf("Node: %d does not exist please try again\n", src);
@@ -40,29 +40,29 @@ void remove_edge(Graph graph, int src, int dest){
     }
 
     Edge currentEdge = returnEdge(find_node(graph, src));
-    if(currentEdge == NULL) return;
+    if(currentEdge == NULL) return; //εάν δεν υπάρχει ακμή
 
-    if(currentEdge->nextEdge == NULL) {
+    if(currentEdge->nextEdge == NULL) { // έαν είναι η μόνη ακμή στο node
         setEdge(NULL, find_node(graph, src));
-        removeIncoming(find_node(graph, dest), src);
+        removeIncoming(find_node(graph, dest), src); //ανανέωση βοηθητικής δομής εισερχόμενων ακμών
         free(currentEdge);
         return;
     }
 
 
-    if (currentEdge->dest == dest){
+    if (currentEdge->dest == dest){ //κυρίως χρήσιμο στη καταστροφή του γράφου η περίπτωση που είναι η στη θέση head
         setEdge(currentEdge->nextEdge, find_node(graph, src));
-        removeIncoming(find_node(graph, dest), src);
+        removeIncoming(find_node(graph, dest), src); //ανανέωση βοηθητικής δομής εισερχόμενων ακμών
         free(currentEdge);
         return;
     }
 
-    Edge previousEdge = currentEdge;
+    Edge previousEdge = currentEdge; //για τις υπόλοιπες περιπτώσεις
     currentEdge = currentEdge->nextEdge;
     while(currentEdge != NULL){
         if (currentEdge->dest == dest){
             previousEdge->nextEdge = currentEdge->nextEdge;
-            removeIncoming(find_node(graph, dest), src);
+            removeIncoming(find_node(graph, dest), src); //ανανέωση βοηθητικής δομής εισερχόμενων ακμών
             free(currentEdge);
             return;
         } else {
@@ -72,7 +72,7 @@ void remove_edge(Graph graph, int src, int dest){
     }
 }
 
-Edge search_edge(Graph graph,  int src, int dest, int weight, char* date){
+Edge search_edge(Graph graph,  int src, int dest, int weight, char* date){ // αναζήτηση
     if (!node_exists(graph, src) || !node_exists(graph, dest)) return NULL;
     Edge index = returnEdge(find_node(graph, src));
 
@@ -85,7 +85,7 @@ Edge search_edge(Graph graph,  int src, int dest, int weight, char* date){
     }
     return NULL;
 }
-
+//modify command miris
 int modify(Graph graph, int src, int dest, int weight, int newWeight, char* date, char* newDate){
     if (!node_exists(graph, src)){
         printf("Node: %d does not exist\n", src);
@@ -104,7 +104,7 @@ int modify(Graph graph, int src, int dest, int weight, int newWeight, char* date
     strncpy(edge->date, newDate, 10);
     return 1;
 }
-
+//find command miris
 void printEdges(Graph graph, int id){
     if (!node_exists(graph, id)){
         printf("Node: %d does not exist\n", id);
@@ -116,7 +116,7 @@ void printEdges(Graph graph, int id){
         edge = edge->nextEdge;
     }
 }
-
+//αποδέσμευση linked list
 void destroy_edges(Edge edge){
     Edge index;
     while(edge != NULL){

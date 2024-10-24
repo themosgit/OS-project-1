@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../include/helper.h"
 
-int get_int(char** command) {
+int get_int(char** command) { //εξαγωγή ints από το command γίνεται advance το command
     char* n = strtok(*command, " ");
     if (n == NULL){
         return -1;
@@ -100,31 +100,29 @@ int commandPrompt(char* command, Graph graph) {
 
     } else if (!strcmp(cmd,"c") || !strcmp(cmd, "circlefind")) {    //circlefind
         node = get_int(&command);
-        if (node) {
-          //  circleFind(graph, node);
+        if (node_exists(graph, node)) {
+            circleFind_traceflow_connected(graph, node, -1, 0);
         }
-        printf("circleFind\n");
 
     } else if (!strcmp(cmd,"fi") || !strcmp(cmd, "findCircles")) {  //findCircles
         node = get_int(&command);
         k = get_int(&command);
-        if (node && k){
-           //circleFind(graph,)
+        if (node_exists(graph, node) && k){
+            circleFind_traceflow_connected(graph, node, k, 0);
         }
-        printf("findCircles\n");
 
-    } else if (!strcmp(cmd,"ti1uh") || !strcmp(cmd, "traceflow")) { //traceflow
+    } else if (!strcmp(cmd,"t") || !strcmp(cmd, "traceflow")) { //traceflow
         node = get_int(&command);
         m = get_int(&command);
         if (node && m){
-            //traceflow()
+            circleFind_traceflow_connected(graph, node, m, 1);
         }
-        printf("traceFlow\n");
-    } else if (!strcmp(cmd,"c") || !strcmp(cmd, "connected")) {     //connected
+
+    } else if (!strcmp(cmd,"o") || !strcmp(cmd, "connected")) {     //connected
         node = get_int(&command);
         node1 = get_int(&command);
         if (node && node1) {
-            //find_path()
+            circleFind_traceflow_connected(graph, node, node1, 2);
         }
         printf("connected\n");
 
