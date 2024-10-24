@@ -15,17 +15,17 @@ typedef enum {
 
 
 struct graph{  //Η δομή του πίνακα κατακερματισμού στον οποίο αποθηκεύεται ο γράφος
-    GraphNode hash_table;
-    int capacity;
+    GraphNode hash_table; //graphNode array
+    int capacity; // χωρητικότητα
     int capacity_index; //Δείκτης για τη θέση στον πίνακα prime sizes
-    int size;
-    HashFunc hash;
+    int size; // αριθμός στοιχείων μέσα στον πίνακα
+    HashFunc hash; // hash function
 
     GraphNode old_hash_table; // παλιός πίνακας κατακερματισμού
-    int old_capacity;
-    int old_size;
-    int rehashing_index;
-};
+    int old_capacity; //χωρητικότητα παλιού πίνακα
+    int old_size; // στοιχεία στον παλιό πίνακα
+    int rehashing_index; // δείκτης για το που βρισκόμαστε στον παλιό πίνακα
+};                       //καθώς κάνουμε rehash. +=2 σε κάθε increment rehash
 
 struct graph_node{ // δομή node
     int id;
