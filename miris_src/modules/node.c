@@ -50,7 +50,7 @@ Graph graph_create(){ // δημιουργία πίνακα κατακερματ�
     }
     graph->hash = test_hash;
     graph->size = 0;
-    graph->old_hash_table = malloc(sizeof(struct graph));
+    graph->old_hash_table = NULL;
     graph->old_capacity = 0;
     graph->old_size = 0;
     graph->rehashing_index = 0;
@@ -111,13 +111,15 @@ int remove_node(Graph graph, int id){ // διαγραφή node και αποδέ
         remove_edge(graph, id, returnEdgeDest(edge));
         edge = node->edges;
     }
+    destroy_edges(node->edges);
     free(node->edges); //στη συνέχεια εισερχόμενων
     incomingNodes inNode = node->nodes;
     while(inNode != NULL){
         remove_edge(graph, returnInNodeId(inNode), id);
         inNode = node->nodes;
     }
-    free(node->edges);
+    destroy_incomingNodes(node->nodes);
+    free(node->nodes);
     node->state = DELETED; // θέτουμε state deleted για να αποφύγουμε λάθη κατά την αναζήτηση
     graph->size--;         //στη περίπτωση που έχει υπάρξει κάποιο collision
     return 1;
@@ -162,8 +164,7 @@ void hash_table_size_increase(Graph graph){ //λειτουργία επέκτα�
         for (int i = 0; i < graph->old_capacity; i++) {
             if (graph->old_size == 0) break;
             if (graph->old_hash_table[i].state == OCCUPIED){
-                destroy_edges(graph->old_hash_table[i].edges);
-                destroy_incomingNodes(graph->old_hash_table[i].nodes);
+                remove_node(graph, graph->old_hash_table[i].id);
             }
         }
         free(graph->old_hash_table);
