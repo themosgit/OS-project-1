@@ -49,7 +49,6 @@ void remove_edge(Graph graph, int src, int dest){ // αφαίρεση ακμής
         return;
     }
 
-
     if (currentEdge->dest == dest){ //κυρίως χρήσιμο στη καταστροφή του γράφου η περίπτωση που είναι η στη θέση head
         setEdge(currentEdge->nextEdge, find_node(graph, src));
         removeIncoming(find_node(graph, dest), src); //ανανέωση βοηθητικής δομής εισερχόμενων ακμών
